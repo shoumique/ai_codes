@@ -40,17 +40,17 @@ int pop()
 
 bool isEmpty()
 {
-    bool flag = true;
+    //bool flag = true;
 
     for(int i = 0; i < node; i++)
     {
         if(Q[i].flag == true)  // our goal is to find if any node's flag is set to true
-            flag = false;     // Bcz it will mean there is still a node in the queue
+            return false;     // Bcz it will mean there is still a node in the queue
                              // if we find a node which flag is set to true
                             // we immediately terminate and return the value
     }
 
-    return flag;            // So if the queue is empty this function will return yes (true)
+    return true;            // So if the queue is empty this function will return yes (true)
 }
 
 void init_Priority_Queue()
