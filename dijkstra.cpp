@@ -18,6 +18,8 @@ struct node
 
 vector<node> adj[SIZE];
 int node, edge;
+int parent[SIZE];
+int dis[SIZE];
 
 int pop()
 {
@@ -44,10 +46,10 @@ bool isEmpty()
 
     for(int i = 0; i < node; i++)
     {
-        if(Q[i].flag == true)  // our goal is to find if any node's flag is set to true
-            return false;     // Bcz it will mean there is still a node in the queue
-                             // if we find a node which flag is set to true
-                            // we immediately terminate and return the value
+        if(Q[i].flag == true)   // our goal is to find if any node's flag is set to true
+            return false;       // Bcz it will mean there is still a node in the queue
+                                // if we find a node which flag is set to true
+                                // we immediately terminate and return the value
     }
 
     return true;            // So if the queue is empty this function will return yes (true)
@@ -61,6 +63,9 @@ void init_Priority_Queue()
         Q[i].node = i;
         Q[i].dis = 9999;
         Q[i].flag = true;
+
+        dis[i] = 9999;
+        parent[i] = -1;
     }
 }
 
@@ -69,6 +74,7 @@ void Dijkstra(int source)
     cout << "Dijkstra Starts" << endl;
     init_Priority_Queue();
 
+    dis[source] = 0;
     Q[source].dis = 0;
 
     while(isEmpty() != 1)
@@ -77,7 +83,7 @@ void Dijkstra(int source)
         int u = pop();
         u = Q[u].node;
 
-        //cout << "First pop: " << u << endl;
+        cout << "First pop: " << u << endl;
 
         //cout << "Neighbour Size: " << adj[u].size() << endl;
 
@@ -87,21 +93,48 @@ void Dijkstra(int source)
 
             temp = adj[u][i];
             int v = temp.n;
-	    int weight = temp.weight;
+            int weight = temp.weight;
 
-            if(Q[v].dis > (Q[u].dis + weight))
+            if(dis[v] > (dis[u] + weight))
             {
-                Q[v].dis = Q[u].dis + weight;
+                dis[v] = dis[u] + weight;
+                //cout << v << " ";
 
+                parent[v] = u;
+                Q[v].dis = dis[v];           // Updating the priority queue
                 //cout << Q[v].dis << endl;
             }
 
         }
 
     }
-
-
 }
+
+void printPathUtil(int source, int j)
+{
+    if (parent[j] == -1)
+        return;
+
+    printPathUtil(source, parent[j]);
+
+    cout << "->" << j;
+}
+
+void printPath(int source)
+{
+    int des;
+
+    cout << "source is NODE: " << source << endl;
+    cout << "Input destination: ";
+    cin >> des;
+
+    cout << endl;
+    cout << source;
+    printPathUtil(source, des);
+
+    cout << endl;
+}
+
 
 void Graph()
 {
@@ -122,8 +155,8 @@ void Graph()
         struct node temp;
 
         infile >> u >> v >> w;
-	//infile >> v;
-	//infile >> w;
+        //infile >> v;
+        //infile >> w;
 
         temp.n = v;
         temp.weight = w;
@@ -158,20 +191,18 @@ int main()
 
     Graph();
 
+    cout << endl;
     cout << "Input source: ";
     cin >> source;
 
     Dijkstra(source);
 
+    cout << endl;
 
-    //init_Priority_Queue();
-
+    printPath(source);
 
     for(int i = 0; i < node; i++)
-        cout << "Node cost from source: node[" << i << "] : " << Q[i].dis << endl;
-
-
-
+        cout << "Node cost from source: node[" << i << "] : " << dis[i] << endl;
 
     return 0;
 }
