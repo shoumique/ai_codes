@@ -109,8 +109,14 @@ bool greedySearch(int x, int y, int des_x, int des_y)
         /// after storing the 4 neighbor, we are going to pick the least distant co-ordinate from the goal
         /// after that, we will set the current as this co-ordinate, that means we'll recursively call the function again
 
-        if(isSafe(x+1, y) == true) // Checking TOP
-        {
+        if(isSafe(x+1, y) == true && solution[x+1][y] == 0) // Checking BOTTOM and also checking if the node is previously
+        {                                                   // visited or not, if it is already visited then the 
+                                                            // corresponding solution grid value must be set to 1. 
+                                                            // So if it is already visited, we are not going to visit 
+                                                            // it again, because that node might be the parent node 
+                                                            // of current node, so if we allow this visit, the code will
+                                                            //  fall into infinite loop. So we are only allowing unvisited
+                                                            // node.
             Q[0].x = x+1;
             Q[0].y = y;
             Q[0].flag = true;
@@ -118,7 +124,7 @@ bool greedySearch(int x, int y, int des_x, int des_y)
             Q[0].dis = calc_dis(x+1, y, des_x, des_y);
         }
 
-        if(isSafe(x-1, y) == true) // Checking bottom
+        if(isSafe(x-1, y) == true && solution[x-1][y] == 0) // Checking TOP
         {
             Q[1].x = x-1;
             Q[1].y = y;
@@ -127,7 +133,7 @@ bool greedySearch(int x, int y, int des_x, int des_y)
             Q[1].dis = calc_dis(x-1, y, des_x, des_y);
         }
 
-        if(isSafe(x, y+1) == true) //Checking right
+        if(isSafe(x, y+1) == true && solution[x][y+1] == 0) //Checking RIGHT
         {
             Q[2].x = x;
             Q[2].y = y+1;
@@ -136,7 +142,7 @@ bool greedySearch(int x, int y, int des_x, int des_y)
             Q[2].dis = calc_dis(x, y+1, des_x, des_y);
         }
 
-        if(isSafe(x, y-1) == true) // Checking left
+        if(isSafe(x, y-1) == true && solution[x][y-1] == 0) // Checking LEFT
         {
             Q[3].x = x;
             Q[3].y = y-1;
@@ -147,11 +153,10 @@ bool greedySearch(int x, int y, int des_x, int des_y)
 
         int index = pop(); // Selecting the index of minimum distant node from the queue
 
-        if(index != -1)
-        {
-            x = Q[index].x; // Setting the x,y as the minimum distant node
-            y = Q[index].y;
-        }
+        
+         x = Q[index].x; // Setting the x,y as the minimum distant node
+         y = Q[index].y;
+       
 
         if(greedySearch(x, y, des_x, des_y) == true) // Recursively calling the function
             return true;                            // It means, if the right co-ordinate is the nearest from the
@@ -161,6 +166,8 @@ bool greedySearch(int x, int y, int des_x, int des_y)
         return false;                               // failed to reach the goal node with this path, so set all
                                                     // the path to 0 and return false
     }
+    
+    return false;
 }
 
 void printSolution()
@@ -173,11 +180,11 @@ void printSolution()
     }
 }
 
-void heuristic()
+void heuristic(int des_x, int des_y)
 {
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++)
-            cout << "  " << calc_dis(i,j,3,3) << "  ";
+            cout << "  " << calc_dis(i,j,des_x,des_y) << "  ";
         cout << endl;
     }
 }
@@ -192,12 +199,20 @@ int main()
     cout << "Input destination co-ordinate: ";
     cin >> des_x >> des_y;
 
-    greedySearch(x, y, des_x, des_y);
+    bool result = greedySearch(x, y, des_x, des_y);
 
-    printSolution();
+    if(result == 0)
+        cout << "\nTHERE IS NO PATH AVAILABLE TO THE DESTINATION" << endl;
+    
+    else {
+        
+        cout << "\nPATH AVAILABLE TO THE DESTINATION" << endl;
+        printSolution();
+        
+    }
 
     cout << endl;
-    heuristic();
+    heuristic(des_x, des_y);
 
     return 0;
 }
